@@ -1,0 +1,19 @@
+- name: Install and Configure nginx
+  hosts: web
+  tasks:
+    - name: Install nginx
+      ansible.builtin.package:  # Use package module to install nginx across all distributions and either RHEL Ubuntu package is baground search for distribution and install nginx 
+        name: nginx
+        state: present
+
+    - name: Start and enable nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Create a simple index.html
+      ansible.builtin.copy:
+        dest: /usr/share/nginx/html/index.html
+        content: "<html><body><h1>Welcome to nginx!</h1></body></html>"
+ 
