@@ -16,5 +16,5 @@
     - name: Create a simple index.html
       ansible.builtin.copy:
         dest: /usr/share/nginx/html/index.html
-        content: "<html><body><h1>Welcome to nginx!</h1></body></html>"
+        content: "<html><body><h1>Welcome to nginx! MDP </h1></body></html>"
  
