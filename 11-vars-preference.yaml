@@ -22,8 +22,26 @@
   tasks:
     - name: Print course details from variable file
       vars:  # Define variables at the all task levels use any tasks of this variables
-          COURSE: "DEVOPS with AWS FROM task level"
+          # 1 cli empty
+          # 2 COURSE: "DEVOPS with AWS FROM task level"
           DURATION: "3 months FROM task level"
           TRAINER: "SKR FROM task level"
       ansible.builtin.debug:
               msg: "Course: {{ COURSE }}" 
+
+ # preference of variables 
+# 1-cli or args ---------- [ec2-user@ip-172-31-79-231 Ansible-Linux]$ ansible-playbook -i inventory.ini 11-vars-preference.yaml -e "COURSE='GCP from cli/args'"
+
+# 2 task level---------- [ec2-user@ip-172-31-79-231 Ansible-Linux]$ ansible-playbook -i inventory.ini 11-vars-preference.yaml
+                # [WARNING]: Found both group and host with same name: localhost
+                # Enter the course name FROM PROMPT: MULTI
+
+                # PLAY [Print course details using variable files] **************************************
+
+                # TASK [Gathering Facts] ****************************************************************
+                # ok: [172.31.72.69]
+
+                # TASK [Print course details from variable file] ****************************************
+                # ok: [172.31.72.69] => {
+                #     "msg": "Course: DEVOPS with AWS FROM task level"
+3 -----------  
