@@ -14,7 +14,7 @@
         COURSE: "ANSIBLE with AWS"
         DURATION: "5 months"
         TRAINER: "SKR-bangalore center"
-        ansible.builtin.debug:
+      ansible.builtin.debug:
         msg: "Course: {{ COURSE }}, Duration: {{ DURATION }}, Trainer: {{ TRAINER }}"
 
     - name: Print course details with task level variables
