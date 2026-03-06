@@ -6,8 +6,8 @@
     DURATION: "3 months FROM play level"
     TRAINER: "SKR FROM play level"
 
-  vars_files:
-  - vars.yaml
+  # vars_files:
+  # - vars.yaml
 
   
 
