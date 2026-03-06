@@ -11,10 +11,10 @@
 
   
 
-  vars_prompt:  # Prompt the user for input when the playbook runs
-    - name: "COURSE"   # Variable name to store the input
-      prompt: "Enter the course name FROM PROMPT"  # Message shown to the user
-      private: no  # Show input as plain text (not hidden)
+  # vars_prompt:  # Prompt the user for input when the playbook runs
+  #   - name: "COURSE"   # Variable name to store the input
+  #     prompt: "Enter the course name FROM PROMPT"  # Message shown to the user
+  #     private: no  # Show input as plain text (not hidden)
 
     # - name: "DURATION"
     #   prompt: "Enter the course duration"
@@ -24,29 +24,19 @@
     #   prompt: "Enter the trainer's name"
     #   private: no
 
-  tasks:
-    - name: Print course details from variable file
-      vars:  # Define variables at the all task levels use any tasks of this variables
-          # 1 cli empty
-          #COURSE: "DEVOPS with AWS FROM task level"  # 2 
-          DURATION: "3 months FROM task level"
-          TRAINER: "SKR FROM task level"
-      ansible.builtin.debug:
-              msg: "Course: {{ COURSE }}" 
+  # tasks:
+  #   - name: Print course details from variable file
+  #     vars:  # Define variables at the all task levels use any tasks of this variables
+  #         # 1 cli empty
+  #         COURSE: "DEVOPS with AWS FROM task level"  # 2 
+  #         DURATION: "3 months FROM task level"
+  #         TRAINER: "SKR FROM task level"
+  #     ansible.builtin.debug:
+  #             msg: "Course: {{ COURSE }}" 
 
  # preference of variables 
-# 1-cli or args ---------- [ec2-user@ip-172-31-79-231 Ansible-Linux]$ ansible-playbook -i inventory.ini 11-vars-preference.yaml -e "COURSE='GCP from cli/args'"
-
-# 2 task level---------- [ec2-user@ip-172-31-79-231 Ansible-Linux]$ ansible-playbook -i inventory.ini 11-vars-preference.yaml
-                # [WARNING]: Found both group and host with same name: localhost
-                # Enter the course name FROM PROMPT: MULTI
-
-                # PLAY [Print course details using variable files] **************************************
-
-                # TASK [Gathering Facts] ****************************************************************
-                # ok: [172.31.72.69]
-
-                # TASK [Print course details from variable file] ****************************************
-                # ok: [172.31.72.69] => {
-                #     "msg": "Course: DEVOPS with AWS FROM task level"
-# 3 -----------  
+ # 1 cli /args
+ # 2 task level 
+ # 3 vars_files seperate file variables define 
+ # 4 prompt when i apply........... yaml file it will ask prompt to print 
+ # 5 
