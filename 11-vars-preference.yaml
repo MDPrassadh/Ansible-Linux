@@ -7,7 +7,7 @@
     TRAINER: "SKR FROM play level"
 
   vars_prompt:  # Prompt the user for input when the playbook runs
-    - name: "COURSE FROM PROMPT"   # Variable name to store the input
+    - name: "COURSE"   # Variable name to store the input
       prompt: "Enter the course name FROM PROMPT"  # Message shown to the user
       private: no  # Show input as plain text (not hidden)
 
