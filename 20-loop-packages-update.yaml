@@ -2,11 +2,22 @@
   hosts: web
   become: yes
   tasks:
-  - name: install packages
-    ansible.builtin.package:
+
+- name: Enable Amazon Linux Extras for MariaDB
+  ansible.builtin.command: amazon-linux-extras enable mariadb10.5
+  when: ansible_distribution == "Amazon"
+
+- name: Install MariaDB server
+  ansible.builtin.package:
+    name: mariadb-server
+    state: present
+  when: ansible_distribution == "Amazon"
+
+- name: install packages
+  ansible.builtin.package:
       name: "{{ item.name }}"
       state: "{{ item.state }}" 
-    loop:
+  loop:
     - { name: 'mysql-server', state: 'present' }
     - { name: 'nginx', state: 'absent' }
     - { name: 'postfix', state: 'absent' }
