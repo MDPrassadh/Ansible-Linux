@@ -16,9 +16,9 @@
     when: USER.rc != 0
   
   - name: Check if user exists
-  ansible.builtin.getent:
+    ansible.builtin.getent:
     #database: passwd
     key: expense
-  register: user_info
+    register: user_info
 
   
