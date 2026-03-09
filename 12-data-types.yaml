@@ -23,5 +23,5 @@
   tasks: 
   - name: print the course information
     ansible.builtin.debug:
-       msg: "Hi Iam Learning {{ course }}, with duration: {{ duration}}, covering with topics {{ topics }}, with tools {{ tools }}"
+       msg: "Hi Iam Learning {{ course }}, with duration: {{ duration}}, covering with topics {{ topics }}, with tools {{ tools }} streaming on {{ live }}"
        
