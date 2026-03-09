@@ -1,17 +1,4 @@
-- name: loops demo
-  hosts: web
-  become: yes
-  tasks:
-
-# - name: Enable Amazon Linux Extras for MariaDB
-#   ansible.builtin.command: amazon-linux-extras enable mariadb10.5
-#   when: ansible_distribution == "Amazon"
-
-# - name: Install MariaDB server
-#   ansible.builtin.package:
-#     name: mariadb-server
-#     state: present
-#   when: ansible_distribution == "Amazon"
+---
 - name: Install MariaDB server on RHEL
   hosts: web
   become: yes
@@ -27,13 +14,15 @@
         state: started
         enabled: yes
 
-
-- name: install packages
-  ansible.builtin.package:
-      name: "{{ item.name }}"
-      state: "{{ item.state }}" 
-  loop:
-    - { name: 'mysql-server', state: 'present' }
-    - { name: 'nginx', state: 'absent' }
-    - { name: 'postfix', state: 'absent' }
-    - { name: 'nginx', state: 'present' }
+- name: Install other packages
+  hosts: web
+  become: yes
+  tasks:
+    - name: Install/remove packages with loop
+      ansible.builtin.package:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+      loop:
+        - { name: 'nginx', state: 'absent' }
+        - { name: 'postfix', state: 'absent' }
+        - { name: 'nginx', state: 'present' }
