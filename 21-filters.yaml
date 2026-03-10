@@ -26,6 +26,12 @@
 
   - name: Get the unique values
     vars:
-      numbers: [1, 1, 1, 2, 3, 4, 4, 6, 5, 7, 8, 9, 8]
+      numbers: [1, 1, 1, 2, 3, 4, 4, 6, 5, 7, 8, 9, 8, 15, 25]
     ansible.builtin.debug:
       msg: "{{ numbers | unique | join(', ') }}"
+  
+  - name: Get the min and max values
+    vars:
+      numbers: [1, 1, 1, 2, 3, 4, 4, 6, 5, 7, 8, 9, 8, 15, 25]
+    ansible.builtin.debug:
+      msg: " min: {{ numbers | min }}  mmax: {{ numbers | max }}"
