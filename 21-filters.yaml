@@ -35,6 +35,7 @@
       numbers: [1, 1, 1, 2, 3, 4, 4, 6, 5, 7, 8, 9, 8, 15, 25]
     ansible.builtin.debug:
       msg: " min: {{ numbers | min }}  mmax: {{ numbers | max }}"
+  
   - name: convert map to list 
     vars: 
       course:
@@ -43,3 +44,12 @@
         trainer: "tilak"
     ansible.builtin.debug:
       msg: "{{ course | dict2items }}"
+
+  - name: Convert list to map
+    vars:
+    course_list:
+      - { key: "name", value: "Devops with AWS" }
+      - { key: "duration", value: 120 }
+      - { key: "trainer", value: "tilak" }
+    ansible.builtin.debug:
+    msg: "{{ course_list | items2dict }}"
