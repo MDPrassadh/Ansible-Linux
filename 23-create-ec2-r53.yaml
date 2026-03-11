@@ -11,7 +11,7 @@
       - frontend 
   tasks: 
   - name: create ec2 instance 
-    key_name: ansible
+    key_name: "ansible"
     amazon.aws.ec2_instance: 
       name: "{{ item }}"
       vpc_subnet_id: "{{ subnet_id }}"
