@@ -5,6 +5,7 @@
     subnet_id: subnet-0648e016f60665d39
     sg_id: sg-02a5e0c53ec4cd644
     ami_id: ami-0ad50334604831820
+    region: us-east-1
     instances:
       - mysql
       - backend
@@ -19,5 +20,6 @@
         security_group: "{{ sg_id }}"
         image_id: "{{ ami_id }}"
         key_name: "ansible"
+        region: "{{ region }}"
       loop: "{{ instances }}"
       register: ec2_instances
