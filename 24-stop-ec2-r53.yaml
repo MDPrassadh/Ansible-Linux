@@ -1,0 +1,27 @@
+- name: manage ec2 and r53
+  hosts: localhost
+  connection: local
+  vars:
+    subnet_id: subnet-0648e016f60665d39
+    sg_id: sg-02a5e0c53ec4cd644
+    ami_id: ami-0ad50334604831820
+    region: us-east-1
+    zone: jioairlines.online
+    instances:
+      - mysql
+      - backend
+      - frontend
+    desired_state: stopped   # change to 'terminated' if you want to delete
+
+  tasks:
+    - name: manage ec2 instance state
+      amazon.aws.ec2_instance:
+        name: "{{ item }}"
+        region: "{{ region }}"
+        state: "{{ desired_state }}"
+      loop: "{{ instances }}"
+      register: ec2_state
+
+    - name: print ec2 state change
+      ansible.builtin.debug:
+        var: ec2_state
