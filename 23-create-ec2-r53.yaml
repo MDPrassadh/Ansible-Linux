@@ -53,10 +53,16 @@
         overwrite: true
       loop: "{{ ec2_instances.results }}"
       when: item.item == "frontend" #when keyword should not have {{}}
-      
+
     - name: print r53 output
       ansible.builtin.debug:
-        msg: "{{ r53_result.results | map(attribute='record_values') | list }}"
+        msg: "{{ item.record }} -> {{ item.record_values }}"
+        loop: "{{ r53_result.results }}"
+
+
+    # - name: print r53 output
+    #   ansible.builtin.debug:
+    #     msg: "{{ r53_result.results | map(attribute='record_values') | list }}"
 
 
     # - name: print r53 output
