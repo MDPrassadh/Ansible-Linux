@@ -56,8 +56,14 @@
 
     - name: print r53 output
       ansible.builtin.debug:
-        msg: "{{ item.record }} -> {{ item.record_values }}"
+        msg: "{{ item.item.item }}.{{ zone }} record created"
       loop: "{{ r53_result.results }}"
+
+
+    - name: print dns records
+      ansible.builtin.debug:
+        msg: "{{ item }}.{{ zone }}"
+      loop: "{{ instances }}"
 
     # - name: print r53 output
     #   ansible.builtin.debug:
