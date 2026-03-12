@@ -35,7 +35,7 @@
         zone: "{{ zone }}"
         record: "{{ item.item }}.{{ zone }}"
         type: A
-        ttl: 1
+        ttl: 60
         value: "{{ item.instances[0].private_ip_address }}"
         wait: true
       loop: "{{ ec2_instances.results }}"
@@ -47,7 +47,7 @@
         zone: "{{ zone }}"
         record: "{{ zone }}"   # jioairlines.online
         type: A
-        ttl: 1
+        ttl: 60
         value: "{{ item.instances[0].public_ip_address }}"
         wait: true
         overwrite: true
@@ -57,7 +57,12 @@
     - name: print r53 output
       ansible.builtin.debug:
         msg: "{{ item.record }} -> {{ item.record_values }}"
-      loop: "{{ r53_result.results | map(attribute='ansible_facts') | list }}"
+      loop: "{{ r53_result.results }}"
+
+    # - name: print r53 output
+    #   ansible.builtin.debug:
+    #     msg: "{{ item.record }} -> {{ item.record_values }}"
+    #   loop: "{{ r53_result.results | map(attribute='ansible_facts') | list }}"
 
 
 
