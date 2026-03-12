@@ -1,29 +1,96 @@
 - name: create ec2 and r53
-  hosts: local
+  hosts: localhost
   connection: local
   vars:
     subnet_id: subnet-0648e016f60665d39
     sg_id: sg-02a5e0c53ec4cd644
-    ami_id: ami-0ad50334604831820
+    ami_id: ami-0ad0953544048451f
     region: us-east-1
+    zone: jioairlines.online
     instances:
       - mysql
       - backend
       - frontend
 
   tasks:
-  - name: create ec2 instance
-    amazon.aws.ec2_instance:
-      name: "{{ item }}"
-      vpc_subnet_id: "{{ subnet_id }}"
-      instance_type: "t3.micro"
-      security_group: "{{ sg_id }}"
-      image_id: "{{ ami_id }}"
-      key_name: "ansible"
-      region: "{{ region }}"
-    loop: "{{ instances }}"
-    register: ec2_instances
+    - name: create ec2 instance
+      amazon.aws.ec2_instance:
+        name: "{{ item }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        instance_type: t3.micro
+        security_group: "{{ sg_id }}"
+        image_id: "{{ ami_id }}"
+        key_name: ansible
+        region: "{{ region }}"
+      loop: "{{ instances }}"
+      register: ec2_instances
 
-  - name: print the output 
-    ansible.builtin.debug: 
-      msg: "{{ ec2_instances }}"
+    - name: print the output
+      ansible.builtin.debug:
+        msg: "{{ ec2_instances }}"
+
+    - name: create r53 records
+      amazon.aws.route53:
+        state: present
+        zone: "{{ zone }}"
+        record: "{{ item.item }}.{{ zone }}"
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].public_ip_address }}"
+      loop: "{{ ec2_instances.results }}"
+
+    - name: create r53 public record for frontend
+      amazon.aws.route53:
+        state: present
+        zone: "{{ zone }}"
+        record: "{{ zone }}" #jioairlines.online
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].public_ip_address }}"
+        wait: true
+        overwrite: true
+      loop: "{{ ec2_instances.results }}"
+      when: item.item == "frontend" #when keyword should not have {{}}
+
+
+
+# - name: create ec2 and r53
+#   hosts: localhost
+#   connection: local
+#   vars:
+#     subnet_id: subnet-0648e016f60665d39
+#     sg_id: sg-02a5e0c53ec4cd644
+#     ami_id: ami-0ad0953544048451f
+#     region: us-east-1
+#     zone: jioairlines.online
+#     instances:
+#       - mysql
+#       - backend
+#       - frontend
+
+#   tasks:
+#     - name: create ec2 instance
+#       amazon.aws.ec2_instance:
+#         name: "{{ item }}"
+#         vpc_subnet_id: "{{ subnet_id }}"
+#         instance_type: "t3.micro"
+#         security_group: "{{ sg_id }}"
+#         image_id: "{{ ami_id }}"
+#         key_name: "ansible"
+#         region: "{{ region }}"
+#       loop: "{{ instances }}"
+#       register: ec2_instances
+
+#     - name: print the output
+#       ansible.builtin.debug:
+#         msg: "{{ ec2_instances }}"
+
+#     - name: create r53 records
+#       amazon.aws.route53:
+#         state: present
+#         zone: "{{ zone }}"
+#         record: "{{ item.item }}.{{ zone }}"
+#         type: A
+#         ttl: 60
+#         value: "{{ item.instances[0].public_ip_address }}"
+#       loop: "{{ ec2_instances.results }}"
