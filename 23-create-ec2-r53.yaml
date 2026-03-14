@@ -2,9 +2,9 @@
   hosts: localhost
   connection: local
   vars:
-    subnet_id: subnet-0648e016f60665d39
+    subnet_id: subnet-0180bc868530ad0b1
     sg_id: sg-02a5e0c53ec4cd644
-    ami_id: ami-0ad50334604831820
+    ami_id: ami-0d8d3b1122e36c000
     region: us-east-1
     zone: jioairlines.online
     instances:
