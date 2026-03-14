@@ -1,4 +1,5 @@
-- name: create ec2 and r53
+---
+- name: Provision EC2 instances and Route53 records
   hosts: localhost
   connection: local
   vars:
@@ -7,45 +8,54 @@
     ami_id: ami-0d8d3b1122e36c000
     region: us-east-1
     zone: jioairlines.online
+    key_name: ansible
+    instance_type: t3.micro
     instances:
       - mysql
       - backend
       - frontend
 
   tasks:
-    - name: create ec2 instance
+    - name: Ensure boto3 and botocore are installed
+      ansible.builtin.pip:
+        name:
+          - boto3
+          - botocore
+        executable: pip3.9
+
+    - name: Launch EC2 instances
       amazon.aws.ec2_instance:
         name: "{{ item }}"
         vpc_subnet_id: "{{ subnet_id }}"
-        instance_type: t3.micro
+        instance_type: "{{ instance_type }}"
         security_group: "{{ sg_id }}"
         image_id: "{{ ami_id }}"
-        key_name: ansible
+        key_name: "{{ key_name }}"
         region: "{{ region }}"
       loop: "{{ instances }}"
       register: ec2_instances
 
-    - name: print the output
+    - name: Show EC2 instance details
       ansible.builtin.debug:
-        msg: "{{ ec2_instances }}"
+        var: ec2_instances
 
-    - name: create r53 and pvt records
+    - name: Create private Route53 records for all instances
       amazon.aws.route53:
         state: present
         zone: "{{ zone }}"
-        record: "{{ item.item }}.{{ zone }}" # mysql.jioairlines.online
+        record: "{{ item.item }}.{{ zone }}"
         type: A
         ttl: 60
         value: "{{ item.instances[0].private_ip_address }}"
         wait: true
       loop: "{{ ec2_instances.results }}"
-      register: r53_result
+      register: r53_private
 
-    - name: create r53 public record for frontend
+    - name: Create public Route53 record for frontend
       amazon.aws.route53:
         state: present
         zone: "{{ zone }}"
-        record: "{{ zone }}"   # jioairlines.online
+        record: "{{ zone }}"
         type: A
         ttl: 60
         value: "{{ item.instances[0].public_ip_address }}"
@@ -53,172 +63,13 @@
         overwrite: true
       loop: "{{ ec2_instances.results }}"
       when: item.item == "frontend"
+      register: r53_public
 
-    - name: print r53 output
+    - name: Print Route53 private record results
       ansible.builtin.debug:
         msg: "{{ item.item.item }}.{{ zone }} record created"
-      loop: "{{ r53_result.results }}"
+      loop: "{{ r53_private.results }}"
 
-
-    - name: print dns records
+    - name: Print Route53 public record result
       ansible.builtin.debug:
-        msg: "{{ item }}.{{ zone }}"
-      loop: "{{ instances }}"
-
-    # - name: print r53 output
-    #   ansible.builtin.debug:
-    #     msg: "{{ item.record }} -> {{ item.record_values }}"
-    #   loop: "{{ r53_result.results | map(attribute='ansible_facts') | list }}"
-
-
-
-  #     - name: create ec2 and r53
-  # hosts: localhost
-  # connection: local
-  # vars:
-  #   subnet_id: subnet-0648e016f60665d39
-  #   sg_id: sg-02a5e0c53ec4cd644
-  #   ami_id: ami-0ad50334604831820
-  #   region: us-east-1
-  #   zone: jioairlines.online
-  #   instances:
-  #     - mysql
-  #     - backend
-  #     - frontend
-
-  # tasks:
-  #   - name: create ec2 instance
-  #     amazon.aws.ec2_instance:
-  #       name: "{{ item }}"
-  #       vpc_subnet_id: "{{ subnet_id }}"
-  #       instance_type: t3.micro
-  #       security_group: "{{ sg_id }}"
-  #       image_id: "{{ ami_id }}"
-  #       key_name: ansible
-  #       region: "{{ region }}"
-  #     loop: "{{ instances }}"
-  #     register: ec2_instances
-
-  #   - name: print ec2 output
-  #     ansible.builtin.debug:
-  #       var: ec2_instances
-
-  #   - name: create r53 records
-  #     amazon.aws.route53:
-  #       state: present
-  #       zone: "{{ zone }}"
-  #       record: "{{ item.item }}.{{ zone }}"
-  #       type: A
-  #       ttl: 1
-  #       value: "{{ item.instances[0].private_ip_address }}"
-  #       wait: true
-  #     loop: "{{ ec2_instances.results }}"
-  #     register: r53_result
-
-  #   - name: create r53 public record for frontend
-  #     amazon.aws.route53:
-  #       state: present
-  #       zone: "{{ zone }}"
-  #       record: "{{ zone }}"   # jioairlines.online
-  #       type: A
-  #       ttl: 1
-  #       value: "{{ item.instances[0].public_ip_address }}"
-  #       wait: true
-  #       overwrite: true
-  #     loop: "{{ ec2_instances.results }}"
-  #     when: item.item == "frontend"
-
-  #   # Step 1: Inspect the raw structure
-  #   - name: inspect r53_result
-  #     ansible.builtin.debug:
-  #       var: r53_result
-
-  #   # Step 2: Print each loop result safely
-  #   - name: print r53 output summary
-  #     ansible.builtin.debug:
-  #       msg: "{{ item }}"
-  #     loop: "{{ r53_result.results }}"
-
-
-
-    # - name: print r53 output
-    #   ansible.builtin.debug:
-    #     msg: "{{ item.record }} -> {{ item.record_values }}"
-    #   loop: "{{ r53_result.results }}"
-
-    # - name: print r53 output
-    #   ansible.builtin.debug:
-    #     msg: "{{ item.record }} -> {{ item.record_values }}"
-    #   loop: "{{ r53_result.results }}"
-
-
-    # - name: print r53 output
-    #   ansible.builtin.debug:
-    #     msg: "{{ r53_result.results | map(attribute='record_values') | list }}"
-
-
-    # - name: print r53 output
-    #   ansible.builtin.debug:
-    #     msg: "{{ r53_result.resource_record_sets[0].record_values }}"
-
-
-
-
-
-
-
-
-# - name: create ec2 and r53
-#   hosts: local
-#   connection: local
-#   vars:
-#     subnet_id: subnet-0648e016f60665d39
-#     sg_id: sg-02a5e0c53ec4cd644
-#     ami_id: ami-0ad50334604831820
-#     region: us-east-1
-#     instances:
-#     - mysql
-#     - backend
-#     - frontend
-#     zone: jioairlines.online 
-
-#   tasks:
-#   - name: create ec2 instance
-#     amazon.aws.ec2_instance:
-#       name: "{{ item }}"
-#       vpc_subnet_id: "{{ subnet_id }}"
-#       instance_type: "t3.micro"
-#       security_group: "{{ sg_id }}"
-#       image_id: "{{ ami_id }}"
-#       key_name: "ansible"
-#       region: "{{ region }}"
-#     loop: "{{ instances }}"
-#     register: ec2_instances
-
-#   - name: print the output 
-#     ansible.builtin.debug: 
-#       msg: "{{ ec2_instances }}"
-#   - name: create r53 records 
-#   amazon.aws.route53: 
-#     state: present
-#     zone: "{{ zone }}"
-#     record: "{{ item.item }}.{{ zone }}"     # mysql
-#     type: A
-#     ttl: 1
-#     value: "{{ item.instances[0].private_ip_address }}"
-#     wait: true
-
-#   loop: "{{ ec2_instances.results }}" 
-
-#   - name: create r53 public record for frontend
-#     amazon.aws.route53:
-#       state: present
-#       zone: "{{ zone }}"
-#       record: "{{ zone }}" #daws81s.online
-#       type: A
-#       ttl: 1
-#       value: "{{ item.instances[0].public_ip_address }}"
-#       wait: true
-#       overwrite: true
-#     loop: "{{ ec2_instances.results }}"
-#     when: item.item == "frontend" #when keyword should not have {{}}
+        var: r53_public
